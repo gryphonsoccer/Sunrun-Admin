@@ -1,0 +1,99 @@
+<%- include('partials/header') -%>
+<div class="text-center">
+  <h1 class="">Construction Documents</h1>
+</div>
+
+<div class="container cd-section">
+  <div class="row">
+    <div class="col">
+      <h4> Merged Docs</h4>
+    </div>
+    <div class="col-6">
+      <ol>
+        <% mergedConstructionDocumentsList.forEach( el => { %>
+          <form action="" method="get">
+            <li  id="<%=el.id%>"><a href="/ConstructionDocs/downloadDocs/<%=el.id%>"><%=el.mergedConstructionDocumentsFolder%></a><input type="hidden" value="<%=el.id%>"></li>
+          </form>
+        <% }) %>   
+      </ol>
+    </div>
+    <div class="col">
+      <form action="" method="delete">
+        <a id='deleteMergedDocs' href="/ConstructionDocs/deleteMergedDocs" class="btn btn-primary"> Clear Merged Documents</a>
+      </form>
+      <form action="" method="get">
+        <a id='mergeDocs' href="/ConstructionDocs/mergeDocs" class="btn btn-primary mt-1">Merged Documents</a>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="container cd-section">
+  <div class="row">
+    <div class="col">
+      <h4 class="sectionTitle">Upload Docs</h4>
+    </div>
+    <div class="col">
+      <form action="/ConstructionDocs/postConstructionDocs/" method="post" enctype="multipart/form-data">
+        <input type="file" name="postConstructionDocs" multiple>
+        <button class="btn btn-primary">Submit</button>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="container cd-section">
+  <div class="row">
+    <div class="col">
+      <h4> Construction Documents</h4>
+    </div>
+    <div class="col-6">
+      <ol>
+        <% constructionDocsList.forEach( el => { %>
+          <form action="" method="get">
+            <li  id="<%=el.id%>"><a href="/ConstructionDocs/downloadDocs/<%=el.id%>"><%=el.constructionDocsFolder%></a><input type="hidden" value="<%=el.id%>"></li>
+          </form>
+        <% }) %> 
+      </ol>
+    </div>
+    <div class="col">
+      <form action="" method="delete"></form>
+        <a id='deleteDocs' href="/ConstructionDocs/deleteDocs" class="btn btn-primary"> Clear Construction Documents</a>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="container cd-section">
+  <div class="row">
+    <div class="col">
+      <h4> Create Label</h4>
+    </div>
+    <div class="col-6">
+      <form action="" method="get" >
+        <input type="text" name="label_job_code" id="label_job_code" placeholder="Enter job code">
+        <input type="text" name="label_AHJ" id="label_AHJ" placeholder="Enter AHJ">
+        <button id="label_button" href="/ConstructionDocs/label">Create Label</button>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="container cd-section">
+  <div class="row">
+    <div class="col">
+      <h4> Construction Doc Labels</h4>
+    </div>
+    <div class="col-6">
+      <ol>
+        <% folderLabelsList.forEach( el => { %>
+          <form action="" method="get">
+            <li  id="<%=el.id%>"><a href="/ConstructionDocs/downloadDocs/<%=el.id%>"><%=el.folderLabelsFolder%></a><input type="hidden" value="<%=el.id%>"></li>
+          </form>
+        <% }) %> 
+      </ol>
+    </div>
+    <div class="col">
+      <form action="" method="delete">
+        <a id='deleteLabels' href="/ConstructionDocs/deleteLabels" class="btn btn-primary"> Clear Construction Doc Labels</a>
+      </form>
+    </div>
+  </div>
+</div>
+<%- include('partials/footer') -%>

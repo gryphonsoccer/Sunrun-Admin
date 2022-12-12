@@ -1,0 +1,149 @@
+<%- include('partials/header') -%>
+<div class="text-center">
+    <h1 class="">AHJ Editor</h1>
+</div>
+<form action="/ahjEditor/saveAhj" method="post">
+        <div class="row justify-content-around mt-2">
+            <a href="/ahjEditor" class="col-3 btn btn-danger mt-2"> Cancel</a>
+            <button type="submit" class="col-3 btn btn-success mt-2" id="saveAhjButton"> Save AHJ</button>
+        </div>
+    <div>
+        <% if (locals.messages.errors) { %>
+            <% messages.errors.forEach( el => { %>
+                <div class="alert alert-danger"><%= el.msg %></div>
+            <% }) %>    
+        <% } %>
+        <% if (locals.messages.info) { %>
+            <% messages.info.forEach( el => { %>
+                <div class="alert alert-info"><%= el.msg %></div>
+            <% }) %>    
+        <% } %>
+        <div class="row mt-4">
+            <label for="ahjName" class="col-1">AHJ</label>
+            <input type="text" class="form-control col ahjInfo" id="ahjName" name="ahjName">
+            <label for="govType" class="col-1">Jurisdiction Type</label>
+            <select class="form-control col ahjInfo"id="govType" name="govType">
+                <option value=""></option>
+                <option value="VILLAGE">VILLAGE</option>
+                <option value="CITY">CITY</option>
+                <option value="COUNTY">COUNTY</option>
+                <option value="TOWN">TOWN</option>
+            </select>
+        </div>
+        <div class="row mt-1">
+            <label for="address" class="col-1">Address</label>
+            <input type="text" class="form-control col ahjInfo" id="address" name="address">
+            <label for="city" class="col-1">City</label>
+            <input type="text" class="form-control col ahjInfo" id="city" name="city">
+        </div>
+        <div class="row mt-1">
+            <label for="state" class="col-1">State</label>
+            <input type="text" class="form-control col ahjInfo" size="2" id="state" name="state">
+            <label for="zip" class="col-1">ZIP</label>
+            <input type="text" class="form-control col ahjInfo" id="zip" name="zip">
+        </div>
+        <div class="row mt-1">
+            <label for="nec" class="col-1">NEC</label>
+            <input type="number" class="form-control col ahjInfo" size="4" id="nec" name="nec">
+            <label for="copies" class="col-1">Number of Copies</label>
+            <input type="number" class="form-control col ahjInfo" size="1" id="copies" name="copies">
+        </div>
+        <div class="row mt-1">
+            <label for="phone" class="col-1">Phone</label>
+            <input type="tel" class="form-control col ahjInfo"id="phone" name="phone">
+            <label for="email" class="col-1">Email</label>
+            <input type="email" class="form-control col ahjInfo"id="email" name="email">
+        </div>
+        <div class="row mt-1">
+            <label for="url" class="col-1">AHJ url</label>
+            <input type="url" class="form-control col ahjInfo"id="url" name="url">
+            <label for="inspectionNotes" class="col-1">Inspection Notes</label>
+            <textarea type="text" class="form-control col ahjInfo"id="inspectionNotes" name="inspectionNotes"></textarea>
+        </div>
+        <div class="row mt-1">
+            <label for="deliverables" class="col-1">Deliverables</label>
+            <select class="form-control col ahjInfo"id="deliverables" name="deliverables">
+                <option value=""></option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+            <label for="contractPage" class="col-1">Contract Page</label>
+            <select class="form-control col ahjInfo"id="contractPage" name="contractPage">
+                <option value=""></option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="row mt-1">
+            <label for="costBreakdown" class="col-1">Cost Breakdown</label>
+            <select class="form-control col ahjInfo"id="costBreakdown" name="costBreakdown">
+                <option value=""></option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+            <label for="eeStamps" class="col-1">EE Stamps</label>
+            <select class="form-control col ahjInfo"id="eeStamps" name="eeStamps">
+                <option value=""></option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="row mt-1">
+            <label for="electricalLicence" class="col-1">Electrical Licence</label>
+            <select class="form-control col ahjInfo"id="electricalLicence" name="electricalLicence">
+                <option value=""></option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+            <label for="icc" class="col-1">ICC</label>
+            <select class="form-control col ahjInfo"id="icc" name="icc">
+                <option value=""></option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="row mt-1">
+            <label for="roofLicense" class="col-1">Roof License</label>
+            <select class="form-control col ahjInfo"id="roofLicense" name="roofLicense">
+                <option value=""></option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+            <label for="pics" class="col-1">Picture</label>
+            <select class="form-control col ahjInfo"id="pics" name="pics">
+                <option value=""></option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="row mt-1">
+            <label for="hoa" class="col-1">HOA Approval</label>
+            <select class="form-control col ahjInfo"id="hoa" name="hoa">
+                <option value=""></option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+            <label for="customerSignature" class="col-1">Customer Signature</label>
+            <select class="form-control col ahjInfo"id="customerSignature" name="customerSignature">
+                <option value=""></option>
+                <option value="true">Yes</option>
+                <option value="false" >No</option>
+            </select>
+        </div>
+        <div class="row mt-1">
+            <label for="platSurvey" class="col-1">Plat Survey</label>
+            <select class="form-control col ahjInfo"id="platSurvey" name="platSurvey">
+                <option value=""></option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+            <label for="interconnection" class="col-1">Interconnection</label>
+            <select class="form-control col ahjInfo"id="interconnection" name="interconnection">
+                <option value=""></option>
+                <option value="true">Yes</option>
+                <option value="false" >No</option>
+            </select>
+        </div>
+    </div>
+</form>
+<%- include('partials/footer') -%>

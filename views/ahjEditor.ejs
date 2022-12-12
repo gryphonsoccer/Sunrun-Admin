@@ -1,0 +1,151 @@
+<%- include('partials/header') -%>
+<div class="text-center">
+    <h1 class="">AHJ Editor</h1>
+</div>
+<% if (locals.messages.errors) { %>
+    <% messages.errors.forEach( el => { %>
+        <div class="alert alert-danger"><%= el.msg %></div>
+    <% }) %>    
+<% } %>
+<% if (locals.messages.info) { %>
+    <% messages.info.forEach( el => { %>
+        <div class="alert alert-info"><%= el.msg %></div>
+    <% }) %>    
+<% } %>
+<form action="/ahjEditor/viewAhj" method="get">
+        <div class="row justify-content-around mt-2">
+            <datalist id="ahjOfList">
+                <% ahjOfList.forEach( el => { %>
+                <option value="<%=el.ahjCode%>"><%=el.ahjCode%></option>
+                <% }) %> 
+            </datalist>
+ 
+            <input type="text"list="ahjOfList"id="ahjCode" name="ahjCode"size="50"autocomplete="off" />
+            <button type="submit" class="col-3 btn btn-primary mt-2" id="viewAhjButton">View AHJ</button>
+            <a href="/ahjEditor/addAhj" class="col-3 btn btn-primary mt-2"> Add AHJ</a>
+        </div>
+
+    </form>
+    <div>
+        <div class="row mt-4">
+            <label for="ahjName" class="col-1">AHJ</label>
+            <input type="text" class="form-control col ahjInfo" id="ahjName" name="ahjName" value="<%- ahjProperties.ahjName -%>" readonly>
+            <label for="govType" class="col-1">Jurisdiction Type</label>
+            <input type="text" class="form-control col ahjInfo" id="govType" name="govType" value="<%- ahjProperties.govType -%>" readonly>
+        </div>
+        <div class="row mt-1">
+            <label for="address" class="col-1">Address</label>
+            <input type="text" class="form-control col ahjInfo" id="address" name="address" value="<%- ahjProperties.address -%>" readonly>
+            <label for="city" class="col-1">City</label>
+            <input type="text" class="form-control col ahjInfo" id="city" name="city" value="<%- ahjProperties.city -%>" readonly>
+        </div>
+        <div class="row mt-1">
+            <label for="state" class="col-1">State</label>
+            <input type="text" class="form-control col ahjInfo" size="2" id="state" name="state" value="<%- ahjProperties.state -%>" readonly>
+            <label for="zip" class="col-1">ZIP</label>
+            <input type="text" class="form-control col ahjInfo" id="zip" name="zip" value="<%- ahjProperties.zip -%>" readonly>
+        </div>
+        <div class="row mt-1">
+            <label for="nec" class="col-1">NEC</label>
+            <input type="number" class="form-control col ahjInfo" size="4" id="nec" name="nec" value="<%- ahjProperties.nec -%>" readonly>
+            <label for="copies" class="col-1">Number of Copies</label>
+            <input type="number" class="form-control col ahjInfo" size="1" id="copies" name="copies" value="<%- ahjProperties.copies -%>" readonly>
+        </div>
+        <div class="row mt-1">
+            <label for="phone" class="col-1">Phone</label>
+            <input type="tel" class="form-control col ahjInfo"id="phone" name="phone" value="<%- ahjProperties.phone -%>" readonly>
+            <label for="email" class="col-1">Email</label>
+            <input type="email" class="form-control col ahjInfo"id="email" name="email" value="<%- ahjProperties.email -%>" readonly>
+        </div>
+        <div class="row mt-1">
+            <label for="url" class="col-1">AHJ url</label>
+            <input type="url" class="form-control col ahjInfo"id="url" name="url" value="<%- ahjProperties.url -%>" readonly>
+            <label for="inspectionNotes" class="col-1">Inspection Notes</label>
+            <textarea type="text" class="form-control col ahjInfo"id="inspectionNotes" name="inspectionNotes" value="<%- ahjProperties.inspectionNotes -%>" readonly></textarea>
+        </div>
+        <div class="row mt-1">
+            <label for="deliverables" class="col-1">Deliverables</label>
+            <select class="form-control col ahjInfo"id="deliverables" name="deliverables" value="<%- ahjProperties.deliverables -%>" readonly>
+                <option value="" disabled></option>
+                <option value="true" <%= ahjProperties.contractPage === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.contractPage === false ? 'selected' : ''%> disabled>No</option>
+            </select>
+            <label for="contractPage" class="col-1">Contract Page</label>
+            <select class="form-control col ahjInfo"id="contractPage" name="contractPage" value="<%- ahjProperties.contractPage -%>" readonly>
+                <option value=""  disabled></option>
+                <option value="true" <%= ahjProperties.contractPage === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.contractPage === false ? 'selected' : ''%> disabled>No</option>
+            </select>
+        </div>
+        <div class="row mt-1">
+            <label for="costBreakdown" class="col-1">Cost Breakdown</label>
+            <select class="form-control col ahjInfo"id="costBreakdown" name="costBreakdown" value="<%- ahjProperties.costBreakdown -%>" readonly>
+                <option value="" disabled></option>
+                <option value="true" <%= ahjProperties.costBreakdown === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.costBreakdown === false ? 'selected' : ''%> disabled>No</option>
+            </select>
+            <label for="eeStamps" class="col-1">EE Stamps</label>
+            <select class="form-control col ahjInfo"id="eeStamps" name="eeStamps" value="<%- ahjProperties.eeStamps -%>" readonly>
+                <option value=""  disabled></option>
+                <option value="true" <%= ahjProperties.eeStamps === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.eeStamps === false ? 'selected' : ''%> disabled>No</option>
+            </select>
+        </div>
+        <div class="row mt-1">
+            <label for="electricalLicence" class="col-1">Electrical Licence</label>
+            <select class="form-control col ahjInfo"id="electricalLicence" name="electricalLicence" value="<%- ahjProperties.electricalLicence -%>" readonly>
+                <option value="" disabled></option>
+                <option value="true" <%= ahjProperties.electricalLicence === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.electricalLicence === false ? 'selected' : ''%> disabled>No</option>
+            </select>
+            <label for="icc" class="col-1">ICC</label>
+            <select class="form-control col ahjInfo"id="icc" name="icc" value="<%- ahjProperties.icc -%>" readonly>
+                <option value=""  disabled></option>
+                <option value="true" <%= ahjProperties.icc === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.icc === false ? 'selected' : ''%> disabled>No</option>
+            </select>
+        </div>
+        <div class="row mt-1">
+            <label for="roofLicense" class="col-1">Roof License</label>
+            <select class="form-control col ahjInfo"id="roofLicense" name="roofLicense" value="<%- ahjProperties.roofLicense -%>" readonly>
+                <option value="" disabled></option>
+                <option value="true" <%= ahjProperties.roofLicense === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.roofLicense === false ? 'selected' : ''%> disabled>No</option>
+            </select>
+            <label for="pics" class="col-1">Picture</label>
+            <select class="form-control col ahjInfo"id="pics" name="pics" value="<%- ahjProperties.pics -%>" readonly>
+                <option value="" disabled></option>
+                <option value="true" <%= ahjProperties.pics === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.pics === false ? 'selected' : ''%> disabled>No</option>
+            </select>
+        </div>
+        <div class="row mt-1">
+            <label for="hoa" class="col-1">HOA Approval</label>
+            <select class="form-control col ahjInfo"id="hoa" name="hoa" value="<%- ahjProperties.hoa -%>" readonly>
+                <option value="" disabled></option>
+                <option value="true" <%= ahjProperties.hoa === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.hoa === false ? 'selected' : ''%> disabled>No</option>
+            </select>
+            <label for="customerSignature" class="col-1">Customer Signature</label>
+            <select class="form-control col ahjInfo"id="customerSignature" name="customerSignature" value="<%- ahjProperties.customerSignature -%>" readonly>
+                <option value=""  disabled></option>
+                <option value="true" <%= ahjProperties.customerSignature === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.customerSignature === false ? 'selected' : ''%> disabled>No</option>
+            </select>
+        </div>
+        <div class="row mt-1">
+            <label for="platSurvey" class="col-1">Plat Survey</label>
+            <select class="form-control col ahjInfo"id="platSurvey" name="platSurvey" value="<%- ahjProperties.platSurvey -%>" readonly>
+                <option value="" disabled></option>
+                <option value="true" <%= ahjProperties.platSurvey === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.platSurvey === false ? 'selected' : ''%> disabled>No</option>
+            </select>
+            <label for="interconnection" class="col-1">Interconnection</label>
+            <select class="form-control col ahjInfo"id="interconnection" name="interconnection" value="<%- ahjProperties.interconnection -%>" readonly>
+                <option value=""  disabled></option>
+                <option value="true" <%= ahjProperties.interconnection === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.interconnection === false ? 'selected' : ''%> disabled>No</option>
+            </select>
+        </div>
+    </div>
+<%- include('partials/footer') -%>

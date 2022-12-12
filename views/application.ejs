@@ -1,0 +1,36 @@
+<%- include('partials/header') -%>
+<div class="text-center">
+    <h1 class="">Application</h1>
+</div>
+<div class="container cd-section">
+    <div class="row">
+      <div class="col">
+        <h4> Solar Application</h4>
+      </div>
+      <div class="col-6">
+        <ol>
+          <li>
+            <a href="">Download Solar Application</a>
+          </li>
+        </ol>
+      </div>
+      <div class="col">
+          <a href="" class="btn btn-primary"> Clear Applications</a>
+      </div>
+    </div>
+  </div>
+  <div class="container cd-section">
+    <div class="row">
+      <div class="col">
+        <h4 class="sectionTitle">Upload Deliverables</h4>
+      </div>
+      <div class="col">
+        <form action="/ConstructionDocs/deliverables-temp/" method="post" enctype="multipart/form-data">
+          <input type="file" name="deliverables-temp" multiple>
+          <button class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+<%- include('partials/footer') -%>

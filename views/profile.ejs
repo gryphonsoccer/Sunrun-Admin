@@ -1,0 +1,28 @@
+<%- include('partials/header') -%>
+<div class="text-center">
+  <h1 class="">Profile</h1>
+</div>
+<main class="container">
+  <div class="row justify-content-around mt-2">
+      <a href="/profile/editProfile" class="col-3 btn btn-primary" id="editProfileButton"> Edit Profile</a>
+      <a href="/logout" class="col-3 btn btn-primary"> Logout</a>
+  </div>
+</main>
+<div>
+<div class="row mt-4">
+    <label for="fullName" class="col-1">Full Name</label>
+    <input type="text" class="form-control col editProfile" id="fullName" name="fullName" value="<%- user.fullName -%>" readonly>
+    <label for="email" class="col-1">Email</label>
+    <input type="email" class="form-control col editProfile" id="email" name="email" value="<%- user.email -%>" readonly>
+</div>
+<div class="row mt-1">
+    <label for="phone" class="col-1">Phone</label>
+    <input type="tel" class="form-control col editProfile" id="phone" name="phone" value="<%- user.phone -%>" readonly>
+    <label for="branch" class="col-1">Branch</label>
+    <input type="number" class="form-control col editProfile" id="branch" name="branch" value="<%- user.branch -%>" readonly>
+</div>
+</div>
+
+
+
+<%- include('partials/footer') -%>

@@ -4,12 +4,15 @@ const authController = require("../controllers/auth");
 const ahjEditorController = require("../controllers/ahjEditor");
 const dashboardController = require("../controllers/dashboard");
 const { ensureAuth, ensureGuest } = require("../middleware/auth");
+upload = require("../middleware/multer");
 
-//Main Routes - simplified for now
+
 router.get("/", ahjEditorController.getAhjEditor);
 router.get("/viewAhj", ahjEditorController.getAhjView);
 router.get("/addAhj", ahjEditorController.getAddAhj);
 router.post("/saveAhj", ahjEditorController.postAhjEditor);
-
-
-module.exports = router;
+router.get("/viewApplication", ahjEditorController.getApplication);
+router.post('/applicationForm',upload.any('deliverables-temp'),ahjEditorController.postApplication)
+//router.post("/coordinates", ahjEditorController.coordinates);
+ 
+module.exports = router; 

@@ -1,11 +1,46 @@
+const AHJ = require("../models/AHJ");
 const { PDFDocument, PageSizes,StandardFonts, rgb } = require("pdf-lib");
 const path = require('path')
 const { writeFileSync, readFileSync, readdirSync } = require("fs");
 
-async function createPDF() {
+async function createPDF(project) {
   const PDFdoc = await PDFDocument.create();
   const page = PDFdoc.addPage(PageSizes.Letter);
-  writeFileSync("blank.pdf", await PDFdoc.save());
+  const helvetica = await PDFdoc.embedFont(StandardFonts.Helvetica);
+  
+  
+  
+
+  let ahjProperties = await AHJ.find({ahjCode:project.ahj})
+  let inspectionNotesList = ahjProperties[0].inspectionNotes
+
+  page.drawText(project.jobCode, {
+    x: 35,
+    y:750,
+    font: helvetica,
+    size: 12,
+    });
+ 
+  //page.moveTo(1275,2770);
+  page.drawText(project.ahj, {
+    x: 290,
+    y:712,
+    font: helvetica,
+    size: 12,
+    });
+        
+  //page.moveTo(330,2440);
+  page.drawText(inspectionNotesList, {
+    x:35,
+    y:670,
+    font: helvetica,
+    size: 11,
+    maxWidth:500,
+    lineHeight:15,
+    });
+      
+    
+  writeFileSync(path.join(process.cwd(),'Inspection Notes\\'+project.jobCode+","+project.ahj+" Insection Notes.pdf"), await PDFdoc.save());   
 }
   
 exports.createPDF = createPDF;
@@ -62,6 +97,46 @@ async function createLabel(project) {
         font: helvetica,
         size: 12,
       });
+
+    //Inspection Notes 
+    
+
+    let ahjProperties = await AHJ.find({ahjCode:project.ahj})
+    if(ahjProperties[0]){
+      if(project.ahj/*ahjProperties[0].inspectionNotes*/){
+        firstPage.moveTo(534,581.2);
+        firstPage.drawText(project.ahj, {
+        font: helvetica,
+        size: 12,
+      });
+
+
+        
+        let inspectionNotesList = ahjProperties[0].inspectionNotes
+      
+  
+        if(inspectionNotesList){
+          firstPage.moveTo(534,581.2);
+          firstPage.drawText(project.ahj, {
+            font: helvetica,
+            size: 12,
+          });
+
+          firstPage.moveTo(410,560);
+          firstPage.drawText(inspectionNotesList, {
+            font: helvetica,
+            size: 11,
+            maxWidth:380,
+            lineHeight:15,
+          });
+        }
+        
+      }
+    }
+    
+
+
+
     writeFileSync(path.join(process.cwd(),'Folder Labels\\'+project.jobCode+" Folder Label.pdf"), await constructionLabel.save());
   }
 
@@ -76,8 +151,8 @@ async function createConstructionDocs(constructionDoc,plans, project) {
   for (const page of pagesArray) {
     constructionDocMerge.addPage(page);
   }
-  constructionDocMerge.addPage(pagesArray[1]);
-  constructionDocMerge.addPage(pagesArray[2]);
+  //constructionDocMerge.addPage(pagesArray[1]);
+  //constructionDocMerge.addPage(pagesArray[2]);
 
   writeFileSync(path.join(process.cwd(),'Construction Documents\\'+project.jobCode+" Construction Documents.pdf"), await constructionDocMerge.save());
 }
@@ -86,7 +161,7 @@ exports.createConstructionDocs = createConstructionDocs;
 
 
 async function mergeDocs(folderName,folder){
-
+  try{
     const firstDoc = await PDFDocument.load(readFileSync(path.join(process.cwd(),folderName+'\\'+folder[0])));
     for(i=1;i<folder.length;i++){
       const docMerge = await PDFDocument.load(readFileSync(path.join(process.cwd(),folderName+'\\'+folder[i])));
@@ -95,12 +170,19 @@ async function mergeDocs(folderName,folder){
         firstDoc.addPage(page);
       }
     }
-    if(folderName=='Construction Documents'){
+    writeFileSync(path.join(process.cwd(),'Merged Construction Documents\\Merged '+folderName+'.pdf'), await firstDoc.save());
+    /*if(folderName=='Construction Documents'){
       writeFileSync(path.join(process.cwd(),'Merged Construction Documents\\Merged Construction Documents.pdf'), await firstDoc.save());
     }
     if(folderName=='Folder Labels'){
       writeFileSync(path.join(process.cwd(),'Merged Construction Documents\\Merged Folder Labels.pdf'), await firstDoc.save());
-    }   
+    }*/
+  }catch(err){
+    console.log('merge doc function error')
+    console.log(err)
+
+  }
+       
 }
 exports.mergeDocs = mergeDocs;
 

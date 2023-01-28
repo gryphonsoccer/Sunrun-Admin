@@ -12,6 +12,7 @@
         <div class="alert alert-info"><%= el.msg %></div>
     <% }) %>    
 <% } %>
+
 <form action="/ahjEditor/viewAhj" method="get">
         <div class="row justify-content-around mt-2">
             <datalist id="ahjOfList">
@@ -21,11 +22,31 @@
             </datalist>
  
             <input type="text"list="ahjOfList"id="ahjCode" name="ahjCode"size="50"autocomplete="off" />
-            <button type="submit" class="col-3 btn btn-primary mt-2" id="viewAhjButton">View AHJ</button>
-            <a href="/ahjEditor/addAhj" class="col-3 btn btn-primary mt-2"> Add AHJ</a>
         </div>
-
-    </form>
+        <div class="row justify-content-around mt-2">
+            <% if(editAHJ){ %>
+                <a href="/ahjEditor/saveAhjEdit" class="col-2 btn btn-success mt-2">Save</a>
+            <% }else{ %>
+                <button type="submit" class="col-2 btn btn-primary mt-2" id="viewAhjButton">View AHJ</button>
+            <% } %>
+        </div>
+</form>
+<form action="/ahjEditor/addAhj" method="get">
+    <div class="row justify-content-around mt-2">
+            <% if(ahjDrillDown && !editAHJ){ %>
+                <input type="text" id="editAhj" name="editAhj"value='<%- ahjProperties.ahjCode -%>' hidden/>
+                <button  class="col-2 btn btn-success mt-2"> Edit AHJ</button>
+</form>
+            <% }else if(ahjDrillDown && editAHJ){ %>
+                    <a href="/ahjEditor" class="col-2 btn btn-primary mt-2"> Cancel</a>
+            <% }else{ %>
+                    <a href="/ahjEditor/addAhj" class="col-2 btn btn-primary mt-2">Add AHJ</a>
+            <% } %> 
+        </div>
+        <div class="text-center">
+            <h4 class=""><%- ahjProperties.ahjCode -%></h4>
+        </div>
+     
     <div>
         <div class="row mt-4">
             <label for="ahjName" class="col-1">AHJ</label>
@@ -61,14 +82,14 @@
             <label for="url" class="col-1">AHJ url</label>
             <input type="url" class="form-control col ahjInfo"id="url" name="url" value="<%- ahjProperties.url -%>" readonly>
             <label for="inspectionNotes" class="col-1">Inspection Notes</label>
-            <textarea type="text" class="form-control col ahjInfo"id="inspectionNotes" name="inspectionNotes" value="<%- ahjProperties.inspectionNotes -%>" readonly></textarea>
+            <textarea type="text" class="form-control col ahjInfo"id="inspectionNotes" name="inspectionNotes" value="<%- ahjProperties.inspectionNotes -%>" readonly><%- ahjProperties.inspectionNotes -%></textarea>
         </div>
         <div class="row mt-1">
             <label for="deliverables" class="col-1">Deliverables</label>
             <select class="form-control col ahjInfo"id="deliverables" name="deliverables" value="<%- ahjProperties.deliverables -%>" readonly>
                 <option value="" disabled></option>
-                <option value="true" <%= ahjProperties.contractPage === true ? 'selected' : ''%> disabled>Yes</option>
-                <option value="false" <%= ahjProperties.contractPage === false ? 'selected' : ''%> disabled>No</option>
+                <option value="true" <%= ahjProperties.deliverables === true ? 'selected' : ''%> disabled>Yes</option>
+                <option value="false" <%= ahjProperties.deliverables === false ? 'selected' : ''%> disabled>No</option>
             </select>
             <label for="contractPage" class="col-1">Contract Page</label>
             <select class="form-control col ahjInfo"id="contractPage" name="contractPage" value="<%- ahjProperties.contractPage -%>" readonly>
@@ -147,5 +168,18 @@
                 <option value="false" <%= ahjProperties.interconnection === false ? 'selected' : ''%> disabled>No</option>
             </select>
         </div>
+        <% if (ahjProperties.ahjCode) { %>
+            <form action="/ahjEditor/viewApplication" method="get">
+        <% }else{ %>
+            <form action="">
+        <% } %>
+            <div class="row mt-1">
+                <label for="application" class="col-1">Application</label>
+                <input name="application" id="application" type="text" value="<%- ahjProperties.ahjCode -%>" hidden>
+                <button type="submit" class="form-control col ahjInfo" size="2"  >
+                    View Application
+                </button>
+            </div>
+        </form>
     </div>
 <%- include('partials/footer') -%>

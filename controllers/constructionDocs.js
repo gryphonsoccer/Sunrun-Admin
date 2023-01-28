@@ -16,6 +16,7 @@ const { ALL } = require("dns");
 module.exports = {
     getConstructionDocs: async (req, res) => {
       try {
+        let deliverableErrors = {zipError:[],pdfError:[]}
         let deliverables = await cloudinary.api.resources({resource_type : 'raw',max_results: 1})
         let mergedConstructionDocumentsFolder = fs.readdirSync(path.join(process.cwd(),'Merged Construction Documents'))
         let constructionDocsFolder = fs.readdirSync(path.join(process.cwd(),'Construction Documents'))
@@ -40,7 +41,8 @@ module.exports = {
           deliverables: deliverables,
           mergedConstructionDocumentsList:mergedConstructionDocumentsList,
           constructionDocsList:constructionDocsList,
-          folderLabelsList:folderLabelsList
+          folderLabelsList:folderLabelsList,
+          deliverableErrors: deliverableErrors
         });
       } catch (err) {
         console.log(err);
@@ -49,8 +51,9 @@ module.exports = {
     postConstructionDocs: async (req, res) => {
       try {
         let publicIdList = []
-        let deliverables = await cloudinary.api.resources({resource_type : 'raw'})
-        console.log(deliverables.resources)
+        let deliverableErrors = {zipError:[],pdfError:[]}
+        let deliverables = await cloudinary.api.resources({resource_type : 'raw',folder:'zip file folder'})
+     
         
         //Unzip folder
         console.log(deliverables.resources.length)
@@ -68,18 +71,28 @@ module.exports = {
         }
         
 
-        for(i=0;i<deliverables.resources.length/*-1*/;i++){
+        for(i=0;i<deliverables.resources.length;i++){
           await GetZip(deliverables.resources[i].url)
           let collectedVariables = await GetUnzip()
-          await CDhelpers.createConstructionDocs(collectedVariables.deliverablesList.CD,collectedVariables.deliverablesList.unstampedPlans,collectedVariables.cdVariablesList).catch((err) => console.log(err));
-          await CDhelpers.createLabel(collectedVariables.cdVariablesList)
+          try{
+            await CDhelpers.createConstructionDocs(collectedVariables.deliverablesList.CD,collectedVariables.deliverablesList.unstampedPlans,collectedVariables.cdVariablesList).catch((err) => console.log(err,'poooooooooop'));
+            await CDhelpers.createLabel(collectedVariables.cdVariablesList)
+          
+          }catch(err){
+            deliverableErrors.zipError.push(deliverables.resources[i].public_id.split('/')[1])
+            console.log(deliverableErrors)
+          }
+          try{
+            await CDhelpers.createPDF(collectedVariables.cdVariablesList)
+          }catch(err){
+            console.log(err)
+          }
           let constructionDocsFolder = fs.readdirSync(path.join(process.cwd(),'Construction Documents'))
           console.log(constructionDocsFolder[0])
           let dist = fs.readdirSync(path.join(process.cwd(),'dist'))
           helpers.clearDocs (dist,'dist')
-          console.log(deliverables.resources[i].public_id)
+        
           publicIdList.push(deliverables.resources[i].public_id)
-          //await cloudinary/*.api*/.uploader.destroy(deliverables.resources[i].public_id)
         }
 
         await cloudinary.api.delete_resources(publicIdList,{resource_type : 'raw'})
@@ -88,8 +101,21 @@ module.exports = {
 
 
         let constructionDocsFolder = fs.readdirSync(path.join(process.cwd(),'Construction Documents'))
-        //await CDhelpers.mergeDocumentsFromFolder(constructionDocsFolder)
         let folderLabelsFolder = fs.readdirSync(path.join(process.cwd(),'Folder Labels'))
+
+
+        let compareConstructionDocs = constructionDocsFolder.map(el =>el.split(' ')[0])
+        let compareLabels = folderLabelsFolder.map(el =>el.split(' ')[0])
+
+        compareLabels.forEach(el=>{
+          if(!compareConstructionDocs.includes(el)){
+            deliverableErrors.pdfError.push(el)
+          }
+        })
+
+
+
+
         let mergedConstructionDocumentsFolder = fs.readdirSync(path.join(process.cwd(),'Merged Construction Documents'))
         let mergedConstructionDocumentsList = []
         let constructionDocsList = []
@@ -111,7 +137,8 @@ module.exports = {
           deliverables: deliverables,
           mergedConstructionDocumentsList:mergedConstructionDocumentsList,
           constructionDocsList:constructionDocsList,
-          folderLabelsList:folderLabelsList
+          folderLabelsList:folderLabelsList,
+          deliverableErrors:deliverableErrors 
         });
       } catch (err) {
         console.log(err);
@@ -127,8 +154,10 @@ module.exports = {
     },
     deleteLabels: async (req, res) => {
       let labelFolder = fs.readdirSync(path.join(process.cwd(),'Folder Labels'))
+      let inspectionNotesFolder = fs.readdirSync(path.join(process.cwd(),'Inspection Notes'))
       if(labelFolder.length>0){
         helpers.clearDocs (labelFolder,'Folder Labels')
+        helpers.clearDocs (inspectionNotesFolder,'Inspection Notes')
       }
       res.redirect('/ConstructionDocs')
     },
@@ -142,11 +171,15 @@ module.exports = {
     mergeDocs: async (req, res) => {
       let constructionDocumentsFolder = fs.readdirSync(path.join(process.cwd(),'Construction Documents'))
       let labelFolder = fs.readdirSync(path.join(process.cwd(),'Folder Labels'))
+      let inspectionNotesFolder = fs.readdirSync(path.join(process.cwd(),'Inspection Notes'))
       if(constructionDocumentsFolder.length>0){
         await CDhelpers.mergeDocs ('Construction Documents',constructionDocumentsFolder)
       }
       if(labelFolder.length>0){
         await CDhelpers.mergeDocs ('Folder Labels',labelFolder)
+      }
+      if(inspectionNotesFolder.length>0){
+        await CDhelpers.mergeDocs ('Inspection Notes',inspectionNotesFolder)
       }
       res.redirect('/ConstructionDocs')
     },

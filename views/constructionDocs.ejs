@@ -32,6 +32,26 @@
     <div class="col">
       <h4 class="sectionTitle">Upload Docs</h4>
     </div>
+    <% if(deliverableErrors.zipError.length>0 ||deliverableErrors.pdfError.length>0) { %>
+      <div class="col-6">
+        <% if(deliverableErrors.zipError.length>0) { %>
+          <h6 class="sectionTitle">Error with Zip</h6>
+          <ol>
+            <% deliverableErrors.zipError.forEach( el => { %>
+              <li><%=el%></li>
+            <% }) %> 
+          </ol>
+        <% } %>
+        <% if(deliverableErrors.pdfError.length>0) { %>
+          <h6 class="sectionTitle">Error with PDF Merge</h6>
+          <ol>
+            <% deliverableErrors.pdfError.forEach( el => { %>
+              <li><%=el%></li>
+            <% }) %> 
+          </ol>
+        <% } %>
+      </div>
+    <% } %> 
     <div class="col">
       <form action="/ConstructionDocs/postConstructionDocs/" method="post" enctype="multipart/form-data">
         <input type="file" name="postConstructionDocs" multiple>

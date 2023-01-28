@@ -1,0 +1,42 @@
+<%- include('partials/header') -%>
+
+
+<h2>Add/Update Application Form</h2>
+<form action="/ahjEditor/applicationForm/" method="post" enctype="multipart/form-data">
+    <input type="text" name="application" id="application" value="<%- ahjProperties.ahjCode -%>">
+    <input type="file" name="applicationForm" id="applicationForm" multiple>
+    <button class="btn btn-primary">Submit</button>
+  </form>
+
+  <button class="btn btn-success" id="myButton">Edit button</button>
+   
+<div id="divpdf" >
+  <iframe id="pdf" width="100%" height= "500"; src="<%- applicationFormUrl -%>" ></iframe>
+  <h1>hlafdadsfadfasdf</h1>
+</div>
+
+
+<div id="canvas" class="col center"style="height: 1056px; width: 816px;" src="<%- applicationFormImage -%>"></div>
+<img src="<%- applicationFormImage -%>" alt="did not work">
+<div style="background-image: url(<%= background %>);"></div>
+<div style="background-image: url('<%= imageUrl %>');"></div>
+
+<%- applicationFormImage -%>
+
+<% -%>
+<script>
+  var canvas = document.getElementById("canvas");
+  canvas.style.backgroundImage = "url('<%- applicationFormImage -%>')";
+ 
+  canvas.addEventListener("click", function(event) {
+    var rect = canvas.getBoundingClientRect();
+    var x = event.pageX - rect.left - window.pageXOffset;
+    var y = event.pageY - rect.top - window.pageYOffset;
+    var coords = x+","+y;
+   console.log(coords);
+  });
+</script>
+<% -%>
+
+
+<%- include('partials/footer') -%>

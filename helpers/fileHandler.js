@@ -1,11 +1,10 @@
 const cloudinary = require("../middleware/cloudinary");
-const { uploadFile } = require("../middleware/S3");
 const Post = require("../models/Post");
 const fs = require('fs')
 const extract = require('extract-zip')
-const jszip = require('jszip')
 
-const admZip = require('adm-zip');
+
+
 const streamZipFileName = 'streamZipFile.zip'
 const decompress = require('decompress');
 const path = require('path')
@@ -14,9 +13,8 @@ const path = require('path')
 const pdfParser = require('pdf-parse');
 'use strict';
 
-// Import
 const request = require('superagent');
-const { pipe } = require("superagent");
+
 const { pipeline } = require("stream/promises");
 
 
@@ -105,7 +103,7 @@ async function variablesFromBOM(pdfTextListBOM){
 
     return dictOfBOMVariables
   }catch(err){
-    console.log(err)
+
   }
 }
 
@@ -114,8 +112,14 @@ exports.variablesFromBOM = variablesFromBOM;
 async function variablesFromPlans(pdfTextListPlans){
   try{
     dictOfPlansVariables = {}
-    let Check711 = pdfTextListPlans.filter(el =>el.includes('711R-'))[0]
-    let Check712 = pdfTextListPlans.filter(el =>el.includes('712R-'))[0]
+    try{
+      let Check711 = pdfTextListPlans.filter(el =>el.includes('711R-'))[0]
+      let Check712 = pdfTextListPlans.filter(el =>el.includes('712R-'))[0]
+    }catch(err){
+      let Check711 = ''
+      let Check712 = ''
+    }
+    
     if(Check711){
       dictOfPlansVariables['jobCode'] = Check711.trim()
     }else{
@@ -155,7 +159,6 @@ async function variablesFromPlans(pdfTextListPlans){
 
       dictOfPlansVariables['pin'] = pin
     }catch(err){
-      console.log(err)
       dictOfPlansVariables['pin'] = ''
     }
     
@@ -267,25 +270,37 @@ async function variablesFromPlans(pdfTextListPlans){
 exports.variablesFromPlans = variablesFromPlans;
 
 async function variablesFromCD(pdfTextListCD){
-  //Get job code
-
-  dictOfCDVariables = {}
-  let Check711 = pdfTextListCD.filter(el =>el.includes('711R-'))[0]
-  let Check712 = pdfTextListCD.filter(el =>el.includes('712R-'))[0]
-  if(Check711){
-    dictOfCDVariables['jobCode'] = Check711.trim()
-  }else{
-    dictOfCDVariables['jobCode'] = Check712.trim()
-  }
-      //Get customer name from fax 0
-  let customerName = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('fax'))[0])+1]//pdfTextList.filter(el => el.includes('CUSTOMER RESIDENCE'))
-  dictOfCDVariables['customerName'] = customerName
-
-  //Get address
-  let addressLine1 = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('project number'))[0])-2]
-  let addressLine2 = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('project number'))[0])-1]
-  let fullAddressList = addressLine1.concat(" ",addressLine2)
   try{
+    //Get job code
+
+    dictOfCDVariables = {}
+    let Check711 = pdfTextListCD.filter(el =>el.includes('711R-'))[0]
+    let Check712 = pdfTextListCD.filter(el =>el.includes('712R-'))[0]
+    if(Check711){
+      dictOfCDVariables['jobCode'] = Check711.trim()
+    }else{
+      dictOfCDVariables['jobCode'] = Check712.trim()
+    }
+  }catch(err){
+    dictOfCDVariables['jobCode'] = ''
+  }
+  try{
+    //Get customer name from fax 0
+    let customerName = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('fax'))[0])+1]//pdfTextList.filter(el => el.includes('CUSTOMER RESIDENCE'))
+    dictOfCDVariables['customerName'] = customerName
+
+  }catch(err){
+    dictOfCDVariables['customerName'] = ''
+  }
+  
+    
+  
+  
+  try{
+    //Get address
+    let addressLine1 = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('project number'))[0])-2]
+    let addressLine2 = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('project number'))[0])-1]
+    let fullAddressList = addressLine1.concat(" ",addressLine2)
     let address = fullAddressList.split(',')[0]
     let city = fullAddressList.split(',')[1].trim()
     let state = fullAddressList.split(',')[2].trim()
@@ -304,29 +319,44 @@ async function variablesFromCD(pdfTextListCD){
     dictOfCDVariables['state'] = ''
     dictOfCDVariables['zip'] = ''
   }
+  try{
     //Get telephone
-  let phone = pdfTextListCD.filter(el =>el.toLowerCase().includes('tel.'))[0].split('. ')[1]
+    let phone = pdfTextListCD.filter(el =>el.toLowerCase().includes('tel.'))[0].split('. ')[1]
 
-  dictOfCDVariables['phone'] = phone
+    dictOfCDVariables['phone'] = phone
 
-  //Get pin
-  let pin = pdfTextListCD.filter(el =>el.toLowerCase().includes('apn'))[0].split(':')[1].trim()
+  }catch(err){
+    dictOfCDVariables['phone'] =''
+  }
+  try{
+    //Get pin
+    let pin = pdfTextListCD.filter(el =>el.toLowerCase().includes('apn'))[0].split(':')[1].trim()
 
-  dictOfCDVariables['pin'] = pin
+    dictOfCDVariables['pin'] = pin
+  }catch(err){
+    dictOfCDVariables['pin'] =''
+  }
+  
+
+  try{
+    //Get System Size
+    let findSystemSize = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('system size'))[0])+1]
+    let systemSizeDC = Number(findSystemSize.split(',')[0].split('W')[0])
+    let systemSizeAC = Number(findSystemSize.split(',')[1].trim().split('W')[0])
+    dictOfCDVariables['systemSizeDC'] = systemSizeDC
+    dictOfCDVariables['systemSizeAC'] = systemSizeAC
 
 
-  //Get System Size
-  let findSystemSize = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('system size'))[0])+1]
-  let systemSizeDC = Number(findSystemSize.split(',')[0].split('W')[0])
-  let systemSizeAC = Number(findSystemSize.split(',')[1].trim().split('W')[0])
-  dictOfCDVariables['systemSizeDC'] = systemSizeDC
-  dictOfCDVariables['systemSizeAC'] = systemSizeAC
+    //Get kW
+    let kW = systemSizeDC/1000
+    dictOfCDVariables['kW'] = kW
+  }catch(err){
+    dictOfCDVariables['systemSizeDC'] = ''
+    dictOfCDVariables['systemSizeAC'] = ''
+    dictOfCDVariables['kW'] = ''
+  }
 
-
-  //Get kW
-  let kW = systemSizeDC/1000
-  dictOfCDVariables['kW'] = kW
-
+try{
   //Get modules
   let Checkhanwha = pdfTextListCD.filter(el =>el.toLowerCase().includes('hanwha'))
   let Checklongi = pdfTextListCD.filter(el =>el.toLowerCase().includes('longi'))
@@ -337,14 +367,23 @@ async function variablesFromCD(pdfTextListCD){
     dictOfCDVariables['modules'] = CheckLlongi[Checkhanwha.length-1].split('MODULES')[1].split(')')[1].trim()
     dictOfCDVariables['numberOfModules'] = Number(Checklongi[Checkhanwha.length-1].split('MODULES')[1].split(')')[0].split('(')[1])
   }
-
+}catch(err){
+  dictOfCDVariables['modules'] = ''
+  dictOfCDVariables['numberOfModules'] = ''
+}
+  
+try{
   //Get Number of Arrays
   let ArraysList = pdfTextListCD.filter(el =>el.toLowerCase().includes('array ar-0'))
   let numberOfArraysList = ArraysList[ArraysList.length-1].split('').filter(el=>!isNaN(el))
   let numberOfArrays = Number(numberOfArraysList[numberOfArraysList.length-1])
   dictOfCDVariables['numberOfArrays'] = numberOfArrays
   
-
+}catch(err){
+  dictOfCDVariables['numberOfArrays'] = ''
+}
+  
+try{
   //Get Frame Type
   let frameType = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('frame type'))[0])+1]
   dictOfCDVariables['frameType'] = frameType
@@ -358,31 +397,61 @@ async function variablesFromCD(pdfTextListCD){
   let spacing = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('max roof height'))[0])].split('SPACING')[1].split(' ')[0]
   dictOfCDVariables['spacing'] = spacing
 
+}catch(err){
+  dictOfCDVariables['frameType'] = ''
+  dictOfCDVariables['sizeOfRafter'] = ''
+  dictOfCDVariables['numberOfStories'] = ''
+  dictOfCDVariables['spacing'] = ''
+}
 
+try{
   //Electrical Scope of Work
   let mainPanelUpgrade = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('main panel upgrade'))[0])+1]
   dictOfCDVariables['mainPanelUpgrade'] = mainPanelUpgrade
+}catch(err){
+  dictOfCDVariables['mainPanelUpgrade'] = ''
+}
 
+try{
   let mainPanelReplacement = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('main panel replacement'))[0])+1]
   dictOfCDVariables['mainPanelReplacement'] = mainPanelReplacement
+}catch(err){
+  dictOfCDVariables['mainPanelReplacement'] = ''
+}
 
+try{
   let meterAdapter = pdfTextListCD.filter(el =>el.toLowerCase().includes('meter adapter'))[0].split('METER ADAPTER')[1]
   dictOfCDVariables['meterAdapter'] = meterAdapter
+}catch(err){
+  dictOfCDVariables['meterAdapter'] = ''
+}
 
+try{
   let serviceRefeed = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('service refeed'))[0])+1]
   dictOfCDVariables['serviceRefeed'] = serviceRefeed
+}catch(err){
+  dictOfCDVariables['serviceRefeed'] = ''
+}
 
+try{
   let subPanel = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('new sub-panel'))[0])+1]
   dictOfCDVariables['subPanel'] = subPanel
+}catch(err){
+  dictOfCDVariables['subPanel'] = ''
+}
 
+try{
   let interconnection = pdfTextListCD.filter(el =>el.includes('INTERCONNECTION'))[0].split('INTERCONNECTION')[1]
   if(interconnection ==""){
     dictOfCDVariables['interconnection'] = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.includes('INTERCONNECTION'))[0])+1]
   }else{
     dictOfCDVariables['interconnection'] = interconnection
   }
-  
- 
+}catch(err){
+  dictOfCDVariables['interconnection'] = ''
+}  
+
+try{
   let ahj = pdfTextListCD.filter(el =>el.toLowerCase().includes('jurisdiction'))[0].split('JURISDICTION')[1].trim()
   if(ahj ==''){
     let ahjNext = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el =>el.toLowerCase().includes('jurisdiction'))[0])+1]
@@ -390,27 +459,50 @@ async function variablesFromCD(pdfTextListCD){
   }else{
     dictOfCDVariables['ahj'] = ahj
   }
- 
+}catch(err){
+  dictOfCDVariables['ahj'] = ''
+}
 
-
-  
-
+try{
   let utility = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('jurisdiction'))[0])+2].split('BRANCH')[0].trim()
   dictOfCDVariables['utility'] = utility
-
+}catch(err){
+  dictOfCDVariables['utility'] = ''
+}
+  
+try{
   let branch = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('jurisdiction'))[0])+3]
   dictOfCDVariables['branch'] = branch
+}catch(err){
+  dictOfCDVariables['branch'] = ''
+}
+ 
+try{
 
+}catch(err){
+
+}
+
+
+try{
   let inverter1 = pdfTextListCD.filter(el =>el.toLowerCase().includes('inverter(s)'))[0].split('INVERTER(S)')[1].split(')')[1].trim()
   let inverter2 = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('inverter(s)'))[0])+1]
   let inverter3 = pdfTextListCD[pdfTextListCD.indexOf(pdfTextListCD.filter(el => el.toLowerCase().includes('inverter(s)'))[0])+2]
   let inverters = [inverter1, inverter2, inverter3].filter(el=>!el.includes('when applicable'))
 
   dictOfCDVariables['inverters'] = inverters
-
+}catch(err){
+  dictOfCDVariables['inverters'] = ''
+}
+  
+try{
   let energyStorage = pdfTextListCD.filter(el =>el.toLowerCase().includes('energy storage'))[0].split('ENERGY STORAGE')[1]
 
   dictOfCDVariables['energyStorage'] = energyStorage
+}catch(err){
+  dictOfCDVariables['energyStorage'] = ''
+}
+  
 
   return dictOfCDVariables
 }
@@ -578,7 +670,19 @@ async function unzip(remoteZipFileUrl) {
 
   let preUnzippedDeliverables = fs.readdirSync(path.join(process.cwd(),'dist'))
   preUnzippedDeliverables.forEach((el)=>{
-    if(!el.includes('.')){
+      if(fs.statSync(path.join(process.cwd(),'dist\\'+el)).isDirectory()){
+      let innerFolder = fs.readdirSync(path.join(process.cwd(),'dist\\'+el))
+      innerFolder.forEach((innerEl)=>{
+        if(!fs.statSync(path.join(process.cwd(),'dist\\'+el+'\\'+innerEl)).isDirectory()){
+          fs.copyFileSync(path.join(process.cwd(),'dist\\'+el+'\\'+innerEl), path.join(process.cwd(),'dist\\'+innerEl))
+        }
+      })
+      fs.rmSync(path.join(process.cwd(),'dist\\'+el), { recursive: true, force: true });
+    }
+  })
+  let doubleFolderCheck = fs.readdirSync(path.join(process.cwd(),'dist'))
+  doubleFolderCheck.forEach((el) =>{
+    if(fs.statSync(path.join(process.cwd(),'dist\\'+el)).isDirectory()){
       let innerFolder = fs.readdirSync(path.join(process.cwd(),'dist\\'+el))
       innerFolder.forEach((innerEl)=>{
         fs.copyFileSync(path.join(process.cwd(),'dist\\'+el+'\\'+innerEl), path.join(process.cwd(),'dist\\'+innerEl))
